@@ -1,0 +1,39 @@
+{
+  "name": "playwright-framework-demo",
+  "version": "1.0.0",
+  "description": "Production-ready Playwright test framework demonstrating best practices, Page Object Models, fixtures, reporting, and CI integration",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:smoke": "npx playwright test --grep @smoke",
+    "test:visual": "npx playwright test --grep @visual",
+    "test:a11y": "npx playwright test --grep @a11y",
+    "test:api": "npx playwright test tests/api",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "report": "npx playwright show-report"
+  },
+  "dependencies": {
+    "jose": "^6.0.8",
+    "next": "^16.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "^1.52.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "allure-playwright": "^3.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0"
+  }
+}

@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    command: npm run dev
+    environment:
+      - SESSION_SECRET=demo-secret-key-for-docker-development-32chars
+    volumes:
+      - ./data:/app/data
+
+  tests:
+    build: .
+    depends_on:
+      app:
+        condition: service_started
+    environment:
+      - BASE_URL=http://app:3000
+      - CI=true
+    command: >
+      sh -c "
+        echo 'Waiting for app to be ready...' &&
+        npx wait-on http://app:3000 --timeout 60000 &&
+        npx playwright test --project=chromium
+      "
+    volumes:
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results

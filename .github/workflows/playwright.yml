@@ -1,0 +1,86 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
+        shardIndex: [1, 2]
+        shardTotal: [2]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.project }}
+
+      - name: Run Playwright tests
+        run: npx playwright test --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        env:
+          CI: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-${{ matrix.project }}-${{ matrix.shardIndex }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+      - name: Upload traces on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: traces-${{ matrix.project }}-${{ matrix.shardIndex }}
+          path: test-results/**/trace.zip
+          retention-days: 7
+
+  merge-reports:
+    if: ${{ !cancelled() }}
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: playwright-report-*
+          path: all-reports
+
+      - name: Merge reports
+        run: npx playwright merge-reports --reporter=html ./all-reports
+
+      - name: Upload merged report
+        uses: actions/upload-artifact@v4
+        with:
+          name: merged-playwright-report
+          path: playwright-report/
+          retention-days: 14
