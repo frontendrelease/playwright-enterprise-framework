@@ -1,4 +1,4 @@
-# Playwright Framework Demo
+# Playwright Enterprise Framework
 
 A production-ready Playwright test framework demonstrating best practices for end-to-end testing, including Page Object Models, custom fixtures, visual regression, accessibility testing, and CI/CD integration.
 
